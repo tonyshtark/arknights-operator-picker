@@ -39,6 +39,8 @@ body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellips
 html.live .wrap, html.live body::before{display:none}
 html.live, html.live body{height:100%;overflow:hidden}
 html.live body{background:var(--lv-bg,#ffffff);background-image:none}
+html.obs,html.obs body{background:transparent!important}
+html.obs .lv-empty{display:none}
 #live{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
 .lv-view{position:relative;overflow:hidden;transition:opacity .2s ease}
 .lc.pop{animation:lcpop .45s ease-out}
@@ -66,6 +68,39 @@ html.live body{background:var(--lv-bg,#ffffff);background-image:none}
 .seg button:hover{color:var(--text);border-color:var(--dim)}
 .seg button.on{color:var(--accent-ink);background:var(--accent);border-color:var(--accent)}
 #liveTipBtn{height:28px}
+.help-btn.obs-btn{padding:0 8px 0 10px;gap:7px}
+.help-btn{white-space:nowrap}
+@media (max-width:640px){.hdr-r{flex-wrap:wrap;justify-content:flex-end;row-gap:8px}}
+.help-btn .live-dot{display:block;width:8px;height:8px;background:#5a5c63}
+.help-btn .beta{display:inline-block;width:auto;height:auto;padding:3px 5px;background:#e5484d;color:#fff;font:700 10px/1 Consolas,monospace}
+.beta{display:inline-block;font:700 10px/1 Consolas,monospace;letter-spacing:.08em;padding:3px 5px;background:#e5484d;color:#fff;vertical-align:1px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:#5a5c63;flex:none}
+.live-dot.on,.help-btn .live-dot.on{background:#5fd08a;box-shadow:0 0 0 3px rgba(95,208,138,.25)}
+.obs-box{margin:0 0 18px;padding:12px 16px 14px;background:var(--panel);border:1px solid var(--line);font-size:13px;line-height:1.7;color:#c9cacd}
+.obs-box .obs-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 8px}
+.obs-box .obs-head h4{margin:0;font-size:14px;color:var(--text)}
+.obs-box .obs-head .credit{margin-left:auto;font-size:12px;color:var(--dim)}
+.obs-box .obs-head .credit a{color:var(--dim)}
+.obs-warn{margin:0 0 10px;padding:8px 12px;border-left:3px solid #e5484d;background:rgba(229,72,77,.08);font-size:12.5px}
+.obs-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:4px 24px}
+.obs-cols section{min-width:0}
+.obs-box h5{margin:10px 0 4px;font-size:13px;color:var(--accent)}
+.obs-box ul,.obs-box ol{margin:0;padding-left:18px}
+.obs-box b{color:var(--text)}
+.obs-box kbd{font:12px Consolas,monospace;padding:0 5px;border:1px solid var(--line);border-bottom-width:2px;background:var(--bg);color:var(--text)}
+.obs-form{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0}
+.obs-form input,.copy-line input{min-width:0;height:30px;padding:0 8px;border:1px solid var(--line);background:var(--bg);color:var(--text);font:12px Consolas,monospace}
+.obs-form input:focus,.copy-line input:focus{outline:none;border-color:var(--accent)}
+.copy-line{display:flex;gap:6px;margin:6px 0}
+.copy-line input{flex:1}
+.obs-box .b{height:30px;padding:0 12px;border:1px solid var(--line);background:var(--bg);color:var(--text);cursor:pointer;font-family:inherit;font-size:12px;white-space:nowrap}
+.obs-box .b:hover{border-color:var(--accent)}
+.obs-box .b.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.ws-status{display:flex;align-items:center;gap:8px;margin-top:4px;font-size:12.5px;color:var(--dim)}
+.ws-status .b{margin-left:auto}
+.ws-status.on{color:var(--must)}
+.ws-status.err{color:var(--ban)}
+@media (max-width:560px){.obs-form{grid-template-columns:1fr}}
 .seg .sw{display:inline-block;width:12px;height:12px;margin-right:5px;vertical-align:-2px;border:1px solid rgba(255,255,255,.4);background:var(--swc,#ff00ff)}
 #bgColor{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 #bgHex{font:12px Consolas,monospace;color:var(--dim);margin-left:4px}
@@ -272,6 +307,7 @@ footer a{color:var(--dim)}
   <header>
     <h1><small>ARKNIGHTS · RANDOM OPERATOR</small>干员抽选</h1>
     <div class="hdr-r">
+      <button class="help-btn obs-btn" id="obsBtn" aria-expanded="false" aria-controls="obsBox" title="在 OBS 浏览器来源里显示抽选结果（测试功能）"><span class="live-dot" id="obsDot"></span>OBS 浏览器源<span class="beta">BETA</span></button>
       <button class="help-btn live-btn" id="liveBtn" title="打开小窗展示当前抽出的干员，可用 OBS 窗口采集"><span aria-hidden="true">▶</span>小窗展示</button>
       <button class="help-btn" id="helpBtn" aria-haspopup="dialog"><span aria-hidden="true">?</span>使用说明</button>
       <div class="pool">当前卡池<br><b id="poolN">0</b> / <span id="allN">0</span></div>
@@ -327,7 +363,7 @@ footer a{color:var(--dim)}
           <ul>
             <li>快捷键：<kbd>Ctrl</kbd>+<kbd>Z</kbd>（Mac 为 <kbd>⌘</kbd>+<kbd>Z</kbd>）撤销上一步，<kbd>Ctrl</kbd>+<kbd>Y</kbd> 或 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>（Mac 为 <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>）重做，<kbd>Esc</kbd> 关闭弹窗。</li>
             <li>卡片右下角 <b>PRTS ↗</b> 可跳转到该干员的 PRTS 页面。</li>
-            <li><b>小窗展示</b>：右上角按钮打开一个小窗口，同步显示当前抽出的干员（默认 6 位，窗口拉长可显示更多，放不下时循环滚动），可用 OBS「窗口采集」抓取；以圆形或方形头像显示；在主页面「小窗」一行调整方向、形状、滚动速度和背景（纯白、绿幕、纯黑或自定义颜色），抠图参数见该行的「OBS / 绿幕设置说明」。</li>
+            <li><b>小窗展示</b>：右上角按钮打开一个小窗口，同步显示当前抽出的干员（默认 6 位，窗口拉长可显示更多，放不下时循环滚动），可用 OBS「窗口采集」抓取；也可以试用 <b>OBS 浏览器源（BETA）</b>：透明背景、页面最小化也照常同步，设置步骤见右上角「OBS 浏览器源」按钮；以圆形或方形头像显示；在主页面「小窗」一行调整方向、形状、滚动速度和背景（纯白、绿幕、纯黑或自定义颜色），抠图参数见该行的「OBS / 绿幕设置说明」。</li>
             <li>收录 432 名可获得干员，不含预备干员与集成战略专用角色。</li>
           </ul>
         </section>
@@ -380,6 +416,55 @@ footer a{color:var(--dim)}
     <span class="seg" data-k="speed"><b>滚动</b><button data-v="1">慢</button><button data-v="2">中</button><button data-v="3">快</button></span>
     <span class="seg" data-k="bg"><b>背景</b><button data-v="white">纯白</button><button data-v="green">绿幕</button><button data-v="black">纯黑</button><button data-v="custom" title="选择任意背景颜色"><i class="sw" id="bgSwatch"></i>自定义</button><input type="color" id="bgColor" value="#ff00ff" aria-label="自定义背景颜色"><code id="bgHex"></code></span>
     <button class="mini" id="liveTipBtn" aria-expanded="false" aria-controls="liveTip">OBS / 绿幕设置说明</button>
+  </div>
+  <div class="obs-box" id="obsBox" hidden>
+    <div class="obs-head">
+      <h4>OBS 浏览器源</h4><span class="beta">BETA</span>
+      <span class="credit">功能来自 <a href="https://github.com/jisanjin41" target="_blank" rel="noopener">jisanjin41</a> 的贡献</span>
+    </div>
+    <p class="obs-warn"><b>测试功能：</b>还没有在大量真实直播环境中验证。正式开播前请先完整试一遍；出问题时可以随时改回上面的「小窗展示 + 窗口采集」。</p>
+    <div class="obs-cols">
+      <section>
+        <h5>它和小窗有什么不同</h5>
+        <ul>
+          <li>画面直接在 OBS 的<b>浏览器来源</b>里显示，背景<b>透明</b>，不需要绿幕和抠图。</li>
+          <li>本页面可以最小化或被其他窗口挡住，OBS 里的画面照常同步、照常滚动。</li>
+          <li>方向、形状、滚动速度沿用上面「小窗」一行的设置；背景选项只对弹出小窗有效。</li>
+        </ul>
+        <h5>设置步骤</h5>
+        <ol>
+          <li>OBS 菜单「工具 → WebSocket 服务器设置」，勾选<b>开启 WebSocket 服务器</b>，点「显示连接信息」查看端口和密码。</li>
+          <li>OBS 添加<b>浏览器</b>来源，<b>不要勾选</b>「本地文件」，网址填下面这一行；宽 1120、高 210（竖向可用 210 × 1120）。</li>
+        </ol>
+        <div class="copy-line"><input id="obsUrl" readonly aria-label="浏览器源网址"><button class="b" id="obsUrlCopy">复制</button></div>
+        <ol start="3">
+          <li>在下面填好地址和密码，点「连接 OBS」，状态变绿即可。</li>
+        </ol>
+        <div class="obs-form">
+          <input type="text" id="wsUrl" aria-label="OBS WebSocket 地址" placeholder="ws://127.0.0.1:4455" spellcheck="false">
+          <input type="password" id="wsPass" aria-label="OBS WebSocket 密码" placeholder="密码（未开启身份验证可留空）" autocomplete="off">
+        </div>
+        <div class="ws-status" id="wsStatus" role="status" aria-live="polite"><span class="live-dot" id="wsDot"></span><span id="wsText">未连接</span><button class="b primary" id="wsBtn">连接 OBS</button></div>
+      </section>
+      <section>
+        <h5>使用规则</h5>
+        <ul>
+          <li>需要 <b>OBS 28 或更新版本</b>（自带 WebSocket 5）。</li>
+          <li>OBS 和本页面必须在<b>同一台电脑</b>上；本页面要<b>一直开着</b>（可以最小化，但不能关掉标签页），关掉后 OBS 画面停在最后一次的结果。</li>
+          <li>同一时间只用<b>一个</b>页面连接 OBS，多个页面同时连接会互相覆盖。</li>
+          <li>抽取、重抽、单张重抽、再抽、添加、删除、撤销 / 重做都会实时同步；锁定状态不显示在画面上。</li>
+          <li>连接成功后会记住，下次打开本页面自动重连；断线时会自动重试。</li>
+        </ul>
+        <h5>注意事项</h5>
+        <ul>
+          <li><b>密码只保存在本浏览器</b>，不会上传。开播或共享屏幕时注意别把这块区域露出来。</li>
+          <li>浏览器如果询问「是否允许访问本地网络 / 设备」，请选<b>允许</b>，否则连不上 OBS。</li>
+          <li>OBS 里的浏览器源刷新后会先显示上一次的结果，最多 5 秒内对上最新结果。</li>
+          <li>推荐按第 2 步直接填网址。如果改用「本地文件」选了这个 html，页面也会自动识别自己在 OBS 里，切换成浏览器源画面。</li>
+          <li>连不上时依次检查：OBS 是否已打开、WebSocket 是否已开启、端口和密码是否正确、防火墙是否拦截了 OBS。</li>
+        </ul>
+      </section>
+    </div>
   </div>
   <div class="live-tip" id="liveTip" hidden>
     <section>
@@ -453,7 +538,8 @@ footer a{color:var(--dim)}
   <div class="lv-empty" id="lvEmpty">等待抽取…</div>
 </div>
 <script>
-const IS_LIVE = location.hash === "#live";
+const IS_OBS = location.hash === "#obs" || (!!window.obsstudio && location.hash !== "#app"); // OBS 浏览器源（BETA）
+const IS_LIVE = location.hash === "#live" || IS_OBS;
 let liveWin = null;
 const OPS = [{"id":"char_285_medic2","n":"Lancet-2","e":"Lancet-2","p":"医疗","s":"医师","r":1,"y":"lancet 2"},{"id":"char_286_cast3","n":"Castle-3","e":"Castle-3","p":"近卫","s":"无畏者","r":1,"y":"castle 3"},{"id":"char_4220_kormr","n":"虎狼丸","e":"Koromaru","p":"近卫","s":"剑豪","r":1,"y":"hu lang wan"},{"id":"char_376_therex","n":"THRM-EX","e":"Thermal-EX","p":"特种","s":"处决者","r":1,"y":"thrm ex"},{"id":"char_4000_jnight","n":"正义骑士号","e":"\"Justice Knight\"","p":"狙击","s":"速射手","r":1,"y":"zheng yi qi shi hao"},{"id":"char_4077_palico","n":"泰拉大陆调查团","e":"Terra Research Commission","p":"狙击","s":"投掷手","r":1,"y":"tai la da lu diao|tiao cha tuan"},{"id":"char_4091_ulika","n":"U-Official","e":"U-Official","p":"辅助","s":"吟游者","r":1,"y":"u official"},{"id":"char_4093_frston","n":"Friston-3","e":"Friston-3","p":"重装","s":"铁卫","r":1,"y":"friston 3"},{"id":"char_4136_phonor","n":"PhonoR-0","e":"PhonoR-0","p":"辅助","s":"巫役","r":1,"y":"phonor 0"},{"id":"char_4188_confes","n":"CONFESS-47","e":"CONFESS-47","p":"先锋","s":"尖兵","r":1,"y":"confess 47"},{"id":"char_4227_gallus","n":"GALLUS²","e":"GALLUS²","p":"术师","s":"中坚术师","r":1,"y":"gallus"},{"id":"char_4215_buddy","n":"罗德岛隐秘队","e":"Rhodes Island Recon","p":"先锋","s":"战术家","r":1,"y":"luo de dao yin mi dui"},{"id":"char_502_nblade","n":"夜刀","e":"Yato","p":"先锋","s":"尖兵","r":2,"y":"ye dao"},{"id":"char_500_noirc","n":"黑角","e":"Noir Corne","p":"重装","s":"铁卫","r":2,"y":"hei jiao|jue"},{"id":"char_503_rang","n":"巡林者","e":"Rangers","p":"狙击","s":"速射手","r":2,"y":"xun lin zhe"},{"id":"char_501_durin","n":"杜林","e":"Durin","p":"术师","s":"中坚术师","r":2,"y":"du lin"},{"id":"char_009_12fce","n":"12F","e":"12F","p":"术师","s":"扩散术师","r":2,"y":"12f"},{"id":"char_123_fang","n":"芬","e":"Fang","p":"先锋","s":"尖兵","r":3,"y":"fen"},{"id":"char_240_wyvern","n":"香草","e":"Vanilla","p":"先锋","s":"尖兵","r":3,"y":"xiang cao"},{"id":"char_192_falco","n":"翎羽","e":"Plume","p":"先锋","s":"冲锋手","r":3,"y":"ling yu"},{"id":"char_208_melan","n":"玫兰莎","e":"Melantha","p":"近卫","s":"无畏者","r":3,"y":"mei lan sha"},{"id":"char_281_popka","n":"泡普卡","e":"Popukar","p":"近卫","s":"强攻手","r":3,"y":"pao pu ka"},{"id":"char_209_ardign","n":"卡缇","e":"Cardigan","p":"重装","s":"铁卫","r":3,"y":"ka ti"},{"id":"char_122_beagle","n":"米格鲁","e":"Beagle","p":"重装","s":"铁卫","r":3,"y":"mi ge lu"},{"id":"char_284_spot","n":"斑点","e":"Spot","p":"重装","s":"守护者","r":3,"y":"ban dian"},{"id":"char_124_kroos","n":"克洛丝","e":"Kroos","p":"狙击","s":"速射手","r":3,"y":"ke luo si"},{"id":"char_211_adnach","n":"安德切尔","e":"Adnachiel","p":"狙击","s":"速射手","r":3,"y":"an de qie er"},{"id":"char_121_lava","n":"炎熔","e":"Lava","p":"术师","s":"扩散术师","r":3,"y":"yan rong"},{"id":"char_120_hibisc","n":"芙蓉","e":"Hibiscus","p":"医疗","s":"医师","r":3,"y":"fu rong"},{"id":"char_212_ansel","n":"安赛尔","e":"Ansel","p":"医疗","s":"医师","r":3,"y":"an sai er"},{"id":"char_210_stward","n":"史都华德","e":"Steward","p":"术师","s":"中坚术师","r":3,"y":"shi dou hua de"},{"id":"char_278_orchid","n":"梓兰","e":"Orchid","p":"辅助","s":"凝滞师","r":3,"y":"zi lan"},{"id":"char_141_nights","n":"夜烟","e":"Haze","p":"术师","s":"中坚术师","r":4,"y":"ye yan"},{"id":"char_109_fmout","n":"远山","e":"Gitano","p":"术师","s":"扩散术师","r":4,"y":"yuan shan"},{"id":"char_253_greyy","n":"格雷伊","e":"Greyy","p":"术师","s":"扩散术师","r":4,"y":"ge lei yi"},{"id":"char_4051_akkord","n":"协律","e":"Akkord","p":"术师","s":"轰击术师","r":4,"y":"xie lv"},{"id":"char_328_cammou","n":"卡达","e":"Click","p":"术师","s":"驭械术师","r":4,"y":"ka da"},{"id":"char_469_indigo","n":"深靛","e":"Indigo","p":"术师","s":"秘术师","r":4,"y":"shen dian"},{"id":"char_4004_pudd","n":"布丁","e":"Pudding","p":"术师","s":"链术师","r":4,"y":"bu ding"},{"id":"char_235_jesica","n":"杰西卡","e":"Jessica","p":"狙击","s":"速射手","r":4,"y":"jie xi ka"},{"id":"char_126_shotst","n":"流星","e":"Meteor","p":"狙击","s":"速射手","r":4,"y":"liu xing"},{"id":"char_190_clour","n":"红云","e":"Vermeil","p":"狙击","s":"速射手","r":4,"y":"hong yun"},{"id":"char_133_mm","n":"梅","e":"May","p":"狙击","s":"速射手","r":4,"y":"mei"},{"id":"char_118_yuki","n":"白雪","e":"ShiraYuki","p":"狙击","s":"炮手","r":4,"y":"bai xue"},{"id":"char_440_pinecn","n":"松果","e":"Pinecone","p":"狙击","s":"散射手","r":4,"y":"song guo"},{"id":"char_302_glaze","n":"安比尔","e":"Ambriel","p":"狙击","s":"神射手","r":4,"y":"an bi er"},{"id":"char_366_acdrop","n":"酸糖","e":"Aciddrop","p":"狙击","s":"重射手","r":4,"y":"suan tang"},{"id":"char_4062_totter","n":"铅踝","e":"Totter","p":"狙击","s":"攻城手","r":4,"y":"qian huai"},{"id":"char_4100_caper","n":"跃跃","e":"Caper","p":"狙击","s":"回环射手","r":4,"y":"yue yue"},{"id":"char_198_blackd","n":"讯使","e":"Courier","p":"先锋","s":"尖兵","r":4,"y":"xun shi"},{"id":"char_149_scave","n":"清道夫","e":"Scavenger","p":"先锋","s":"尖兵","r":4,"y":"qing dao fu"},{"id":"char_290_vigna","n":"红豆","e":"Vigna","p":"先锋","s":"冲锋手","r":4,"y":"hong dou"},{"id":"char_151_myrtle","n":"桃金娘","e":"Myrtle","p":"先锋","s":"执旗手","r":4,"y":"tao jin niang"},{"id":"char_452_bstalk","n":"豆苗","e":"Beanstalk","p":"先锋","s":"战术家","r":4,"y":"dou miao"},{"id":"char_4208_wintim","n":"冬时","e":"Снегурочка","p":"先锋","s":"情报官","r":4,"y":"dong shi"},{"id":"char_130_doberm","n":"杜宾","e":"Dobermann","p":"近卫","s":"教官","r":4,"y":"du bin"},{"id":"char_289_gyuki","n":"缠丸","e":"Matoimaru","p":"近卫","s":"无畏者","r":4,"y":"chan wan"},{"id":"char_159_peacok","n":"断罪者","e":"Conviction","p":"近卫","s":"无畏者","r":4,"y":"duan zui zhe"},{"id":"char_193_frostl","n":"霜叶","e":"Frostleaf","p":"近卫","s":"领主","r":4,"y":"shuang ye"},{"id":"char_127_estell","n":"艾丝黛尔","e":"Estelle","p":"近卫","s":"强攻手","r":4,"y":"ai si dai er"},{"id":"char_185_frncat","n":"慕斯","e":"Mousse","p":"近卫","s":"术战者","r":4,"y":"mu si"},{"id":"char_301_cutter","n":"刻刀","e":"Cutter","p":"近卫","s":"剑豪","r":4,"y":"ke dao"},{"id":"char_337_utage","n":"宴","e":"Utage","p":"近卫","s":"武者","r":4,"y":"yan"},{"id":"char_271_spikes","n":"芳汀","e":"Arene","p":"近卫","s":"领主","r":4,"y":"fang ting"},{"id":"char_4067_lolxh","n":"罗小黑","e":"Luo Xiaohei","p":"近卫","s":"领主","r":4,"y":"luo xiao hei"},{"id":"char_4063_quartz","n":"石英","e":"Quartz","p":"近卫","s":"重剑手","r":4,"y":"shi ying"},{"id":"char_491_humus","n":"休谟斯","e":"Humus","p":"近卫","s":"收割者","r":4,"y":"xiu mo si"},{"id":"char_445_wscoot","n":"骋风","e":"Windscoot","p":"近卫","s":"解放者","r":4,"y":"cheng feng"},{"id":"char_237_gravel","n":"砾","e":"Gravel","p":"特种","s":"处决者","r":4,"y":"li"},{"id":"char_272_strong","n":"孑","e":"Jaye","p":"特种","s":"行商","r":4,"y":"jie"},{"id":"char_236_rope","n":"暗索","e":"Rope","p":"特种","s":"钩索师","r":4,"y":"an suo"},{"id":"char_117_myrrh","n":"末药","e":"Myrrh","p":"医疗","s":"医师","r":4,"y":"mo yao"},{"id":"char_187_ccheal","n":"嘉维尔","e":"Gavial","p":"医疗","s":"医师","r":4,"y":"jia wei er"},{"id":"char_298_susuro","n":"苏苏洛","e":"Sussurro","p":"医疗","s":"医师","r":4,"y":"su su luo"},{"id":"char_181_flower","n":"调香师","e":"Perfumer","p":"医疗","s":"群愈师","r":4,"y":"diao|tiao xiang shi"},{"id":"char_385_finlpp","n":"清流","e":"Purestream","p":"医疗","s":"疗养师","r":4,"y":"qing liu"},{"id":"char_4041_chnut","n":"褐果","e":"Chestnut","p":"医疗","s":"行医","r":4,"y":"he guo"},{"id":"char_199_yak","n":"角峰","e":"Matterhorn","p":"重装","s":"铁卫","r":4,"y":"jiao|jue feng"},{"id":"char_150_snakek","n":"蛇屠箱","e":"Cuora","p":"重装","s":"铁卫","r":4,"y":"she tu xiang"},{"id":"char_381_bubble","n":"泡泡","e":"Bubble","p":"重装","s":"铁卫","r":4,"y":"pao pao"},{"id":"char_4130_luton","n":"露托","e":"Lutonada","p":"重装","s":"不屈者","r":4,"y":"lu tuo"},{"id":"char_196_sunbr","n":"古米","e":"Гум","p":"重装","s":"守护者","r":4,"y":"gu mi"},{"id":"char_260_durnar","n":"坚雷","e":"Dur-nar","p":"重装","s":"驭法铁卫","r":4,"y":"jian lei"},{"id":"char_110_deepcl","n":"深海色","e":"Deepcolor","p":"辅助","s":"召唤师","r":4,"y":"shen hai se"},{"id":"char_183_skgoat","n":"地灵","e":"Earthspirit","p":"辅助","s":"凝滞师","r":4,"y":"di ling"},{"id":"char_258_podego","n":"波登可","e":"Podenco","p":"辅助","s":"凝滞师","r":4,"y":"bo deng ke"},{"id":"char_484_robrta","n":"罗比菈塔","e":"Roberta","p":"辅助","s":"工匠","r":4,"y":"luo bi la ta"},{"id":"char_355_ethan","n":"伊桑","e":"Ethan","p":"特种","s":"伏击客","r":4,"y":"yi sang"},{"id":"char_277_sqrrel","n":"阿消","e":"Shaw","p":"特种","s":"推击手","r":4,"y":"a xiao"},{"id":"char_4107_vrdant","n":"维荻","e":"Verdant","p":"特种","s":"傀儡师","r":4,"y":"wei di"},{"id":"char_4165_ctrail","n":"云迹","e":"Contrail","p":"特种","s":"巡空者","r":4,"y":"yun ji"},{"id":"char_128_plosis","n":"白面鸮","e":"Ptilopsis","p":"医疗","s":"群愈师","r":5,"y":"bai mian xiao"},{"id":"char_275_breeze","n":"微风","e":"Breeze","p":"医疗","s":"群愈师","r":5,"y":"wei feng"},{"id":"char_4163_rosesa","n":"瑰盐","e":"Rose Salt","p":"医疗","s":"群愈师","r":5,"y":"gui yan"},{"id":"char_115_headbr","n":"凛冬","e":"Зима","p":"先锋","s":"尖兵","r":5,"y":"lin dong"},{"id":"char_102_texas","n":"德克萨斯","e":"Texas","p":"先锋","s":"尖兵","r":5,"y":"de ke sa si"},{"id":"char_349_chiave","n":"贾维","e":"Chiave","p":"先锋","s":"尖兵","r":5,"y":"jia wei"},{"id":"char_488_buildr","n":"青枳","e":"Poncirus","p":"先锋","s":"尖兵","r":5,"y":"qing zhi"},{"id":"char_4023_rfalcn","n":"红隼","e":"Kestrel","p":"先锋","s":"尖兵","r":5,"y":"hong sun"},{"id":"char_4199_makiri","n":"松桐","e":"Matsukiri","p":"先锋","s":"策士","r":5,"y":"song tong"},{"id":"char_261_sddrag","n":"苇草","e":"Reed","p":"先锋","s":"冲锋手","r":5,"y":"wei cao"},{"id":"char_496_wildmn","n":"野鬃","e":"Wild Mane","p":"先锋","s":"冲锋手","r":5,"y":"ye zong"},{"id":"char_1036_fang2","n":"历阵锐枪芬","e":"Fang the Fire-sharpened","p":"先锋","s":"冲锋手","r":5,"y":"li zhen rui qiang fen"},{"id":"char_401_elysm","n":"极境","e":"Elysium","p":"先锋","s":"执旗手","r":5,"y":"ji jing"},{"id":"char_4119_wanqin","n":"万顷","e":"Wanqing","p":"先锋","s":"执旗手","r":5,"y":"wan qing"},{"id":"char_4237_jcinta","n":"嘉辛塔","e":"Jacinta","p":"先锋","s":"执旗手","r":5,"y":"jia xin ta"},{"id":"char_476_blkngt","n":"夜半","e":"Blacknight","p":"先锋","s":"战术家","r":5,"y":"ye ban"},{"id":"char_4147_mitm","n":"渡桥","e":"Mitm","p":"先锋","s":"战术家","r":5,"y":"du qiao"},{"id":"char_497_ctable","n":"晓歌","e":"Cantabile","p":"先锋","s":"情报官","r":5,"y":"xiao ge"},{"id":"char_4017_puzzle","n":"谜图","e":"Puzzle","p":"先锋","s":"情报官","r":5,"y":"mi tu"},{"id":"char_4144_chilc","n":"齐尔查克","e":"Chilchuck","p":"先锋","s":"情报官","r":5,"y":"qi er cha ke"},{"id":"char_4052_surfer","n":"寻澜","e":"Surfer","p":"先锋","s":"情报官","r":5,"y":"xun lan"},{"id":"char_308_swire","n":"诗怀雅","e":"Swire","p":"近卫","s":"教官","r":5,"y":"shi huai ya"},{"id":"char_265_sophia","n":"鞭刃","e":"Whislash","p":"近卫","s":"教官","r":5,"y":"bian ren"},{"id":"char_4106_bryota","n":"苍苔","e":"Bryophyta","p":"近卫","s":"教官","r":5,"y":"cang tai"},{"id":"char_4125_rdoc","n":"医生","e":"Doc","p":"近卫","s":"教官","r":5,"y":"yi sheng"},{"id":"char_106_franka","n":"芙兰卡","e":"Franka","p":"近卫","s":"无畏者","r":5,"y":"fu lan ka"},{"id":"char_131_flameb","n":"炎客","e":"Flamebringer","p":"近卫","s":"无畏者","r":5,"y":"yan ke"},{"id":"char_154_morgan","n":"摩根","e":"Morgan","p":"近卫","s":"无畏者","r":5,"y":"mo gen"},{"id":"char_4142_laios","n":"莱欧斯","e":"Laios","p":"近卫","s":"无畏者","r":5,"y":"lai ou si"},{"id":"char_155_tiger","n":"因陀罗","e":"Indra","p":"近卫","s":"斗士","r":5,"y":"yin tuo luo"},{"id":"char_415_flint","n":"燧石","e":"Flint","p":"近卫","s":"斗士","r":5,"y":"sui shi"},{"id":"char_157_dagda","n":"达格达","e":"Dagda","p":"近卫","s":"斗士","r":5,"y":"da ge da"},{"id":"char_140_whitew","n":"拉普兰德","e":"Lappland","p":"近卫","s":"领主","r":5,"y":"la pu lan de"},{"id":"char_294_ayer","n":"断崖","e":"Ayerscarpe","p":"近卫","s":"领主","r":5,"y":"duan ya"},{"id":"char_194_leto","n":"烈夏","e":"Лето","p":"近卫","s":"领主","r":5,"y":"lie xia"},{"id":"char_4083_chimes","n":"铎铃","e":"Wind Chimes","p":"近卫","s":"重剑手","r":5,"y":"duo ling"},{"id":"char_252_bibeak","n":"柏喙","e":"Bibeak","p":"近卫","s":"剑豪","r":5,"y":"bai hui"},{"id":"char_459_tachak","n":"战车","e":"Tachanka","p":"近卫","s":"剑豪","r":5,"y":"zhan che"},{"id":"char_143_ghost","n":"幽灵鲨","e":"Specter","p":"近卫","s":"强攻手","r":5,"y":"you ling sha"},{"id":"char_356_broca","n":"布洛卡","e":"Broca","p":"近卫","s":"强攻手","r":5,"y":"bu luo ka"},{"id":"char_4126_fuze","n":"导火索","e":"Fuze","p":"近卫","s":"强攻手","r":5,"y":"dao huo suo"},{"id":"char_4166_varkis","n":"摆渡人","e":"Varkáris","p":"近卫","s":"强攻手","r":5,"y":"bai du ren"},{"id":"char_274_astesi","n":"星极","e":"Astesia","p":"近卫","s":"术战者","r":5,"y":"xing ji"},{"id":"char_333_sidero","n":"铸铁","e":"Sideroca","p":"近卫","s":"术战者","r":5,"y":"zhu tie"},{"id":"char_475_akafyu","n":"赤冬","e":"Akafuyu","p":"近卫","s":"武者","r":5,"y":"chi dong"},{"id":"char_1030_noirc2","n":"火龙S黑角","e":"Rathalos S Noir Corne","p":"近卫","s":"武者","r":5,"y":"huo long s hei jiao|jue"},{"id":"char_421_crow","n":"羽毛笔","e":"La Pluma","p":"近卫","s":"收割者","r":5,"y":"yu mao bi"},{"id":"char_4066_highmo","n":"海沫","e":"Highmore","p":"近卫","s":"收割者","r":5,"y":"hai mo"},{"id":"char_486_takila","n":"龙舌兰","e":"Tequila","p":"近卫","s":"解放者","r":5,"y":"long she lan"},{"id":"char_4131_odda","n":"奥达","e":"Odda","p":"近卫","s":"撼地者","r":5,"y":"ao da"},{"id":"char_4187_graceb","n":"聆音","e":"Gracebearer","p":"近卫","s":"本源近卫","r":5,"y":"ling yin"},{"id":"char_4185_amoris","n":"祐天寺若麦","e":"Yūtenji Nyamu","p":"近卫","s":"撼地者","r":5,"y":"you tian si ruo mai"},{"id":"char_394_hadiya","n":"哈蒂娅","e":"Hadiya","p":"近卫","s":"佣兵","r":5,"y":"ha di ya"},{"id":"char_1049_catap2","n":"雷狼龙S空爆","e":"Zinogre S Catapult","p":"近卫","s":"佣兵","r":5,"y":"lei lang long s kong bao"},{"id":"char_129_bluep","n":"蓝毒","e":"Blue Poison","p":"狙击","s":"速射手","r":5,"y":"lan du"},{"id":"char_204_platnm","n":"白金","e":"Platinum","p":"狙击","s":"速射手","r":5,"y":"bai jin"},{"id":"char_367_swllow","n":"灰喉","e":"GreyThroat","p":"狙击","s":"速射手","r":5,"y":"hui hou"},{"id":"char_365_aprl","n":"四月","e":"April","p":"狙击","s":"速射手","r":5,"y":"si yue"},{"id":"char_1021_kroos2","n":"寒芒克洛丝","e":"Kroos the Keen Glint","p":"狙击","s":"速射手","r":5,"y":"han mang ke luo si"},{"id":"char_498_inside","n":"隐现","e":"Insider","p":"狙击","s":"速射手","r":5,"y":"yin xian"},{"id":"char_219_meteo","n":"陨星","e":"Meteorite","p":"狙击","s":"炮手","r":5,"y":"yun xing"},{"id":"char_379_sesa","n":"慑砂","e":"Sesa","p":"狙击","s":"炮手","r":5,"y":"she sha"},{"id":"char_4078_bdhkgt","n":"截云","e":"Jieyun","p":"狙击","s":"炮手","r":5,"y":"jie yun"},{"id":"char_279_excu","n":"送葬人","e":"Executor","p":"狙击","s":"散射手","r":5,"y":"song zang ren"},{"id":"char_346_aosta","n":"奥斯塔","e":"Aosta","p":"狙击","s":"散射手","r":5,"y":"ao si ta"},{"id":"char_4203_kichi","n":"吉星","e":"Kichisei","p":"狙击","s":"散射手","r":5,"y":"ji xing"},{"id":"char_4213_skybx","n":"天空盒","e":"Skybox","p":"狙击","s":"裂空炮手","r":5,"y":"tian kong he"},{"id":"char_4218_aigis","n":"埃癸斯","e":"Aegis","p":"狙击","s":"裂空炮手","r":5,"y":"ai gui si"},{"id":"char_002_amiya","n":"阿米娅","e":"Amiya","p":"术师","s":"中坚术师","r":5,"y":"a mi ya"},{"id":"char_405_absin","n":"苦艾","e":"Absinthe","p":"术师","s":"中坚术师","r":5,"y":"ku ai"},{"id":"char_411_tomimi","n":"特米米","e":"Tomimi","p":"术师","s":"中坚术师","r":5,"y":"te mi mi"},{"id":"char_466_qanik","n":"雪绒","e":"Qanipalaat","p":"术师","s":"中坚术师","r":5,"y":"xue rong"},{"id":"char_166_skfire","n":"天火","e":"Skyfire","p":"术师","s":"扩散术师","r":5,"y":"tian huo"},{"id":"char_306_leizi","n":"惊蛰","e":"Leizi","p":"术师","s":"链术师","r":5,"y":"jing zhe"},{"id":"char_135_halo","n":"星源","e":"Astgenne","p":"术师","s":"链术师","r":5,"y":"xing yuan"},{"id":"char_344_beewax","n":"蜜蜡","e":"Beeswax","p":"术师","s":"阵法术师","r":5,"y":"mi la"},{"id":"char_373_lionhd","n":"莱恩哈特","e":"Leonhardt","p":"术师","s":"扩散术师","r":5,"y":"lai en ha te"},{"id":"char_341_sntlla","n":"寒檀","e":"Santalla","p":"术师","s":"扩散术师","r":5,"y":"han tan"},{"id":"char_4031_liesel","n":"复奏","e":"Ripresa","p":"术师","s":"扩散术师","r":5,"y":"fu zou"},{"id":"char_388_mint","n":"薄绿","e":"Mint","p":"术师","s":"阵法术师","r":5,"y":"bao|bo lv"},{"id":"char_338_iris","n":"爱丽丝","e":"Iris","p":"术师","s":"秘术师","r":5,"y":"ai li si"},{"id":"char_297_hamoni","n":"和弦","e":"Harmonie","p":"术师","s":"秘术师","r":5,"y":"he xian"},{"id":"char_4110_delphn","n":"戴菲恩","e":"Delphine","p":"术师","s":"秘术师","r":5,"y":"dai fei en"},{"id":"char_1011_lava2","n":"炎狱炎熔","e":"Lava the Purgatory","p":"术师","s":"扩散术师","r":5,"y":"yan yu yan rong"},{"id":"char_489_serum","n":"蚀清","e":"Corroserum","p":"术师","s":"轰击术师","r":5,"y":"shi qing"},{"id":"char_446_aroma","n":"阿罗玛","e":"Aroma","p":"术师","s":"轰击术师","r":5,"y":"a luo ma"},{"id":"char_4013_kjera","n":"耶拉","e":"Kjera","p":"术师","s":"驭械术师","r":5,"y":"ye la"},{"id":"char_4040_rockr","n":"洛洛","e":"Rockrock","p":"术师","s":"驭械术师","r":5,"y":"luo luo"},{"id":"char_4054_malist","n":"至简","e":"Minimalist","p":"术师","s":"驭械术师","r":5,"y":"zhi jian"},{"id":"char_4236_tmslot","n":"时隙","e":"Timeslot","p":"术师","s":"驭械术师","r":5,"y":"shi xi"},{"id":"char_499_kaitou","n":"折光","e":"Diamante","p":"术师","s":"本源术师","r":5,"y":"zhe guang"},{"id":"char_4081_warmy","n":"温米","e":"Warmy","p":"术师","s":"本源术师","r":5,"y":"wen mi"},{"id":"char_4198_christ","n":"Miss.Christine","e":"Miss.Christine","p":"术师","s":"本源术师","r":5,"y":"miss christine"},{"id":"char_4164_tecno","n":"特克诺","e":"Tecno","p":"术师","s":"塑灵术师","r":5,"y":"te ke nuo"},{"id":"char_242_otter","n":"梅尔","e":"Mayer","p":"辅助","s":"召唤师","r":5,"y":"mei er"},{"id":"char_336_folivo","n":"稀音","e":"Scene","p":"辅助","s":"召唤师","r":5,"y":"xi yin"},{"id":"char_4140_lasher","n":"衡沙","e":"Sand Reckoner","p":"辅助","s":"召唤师","r":5,"y":"heng sha"},{"id":"char_108_silent","n":"赫默","e":"Silence","p":"医疗","s":"医师","r":5,"y":"he mo"},{"id":"char_171_bldsk","n":"华法琳","e":"Warfarin","p":"医疗","s":"医师","r":5,"y":"hua fa lin"},{"id":"char_345_folnic","n":"亚叶","e":"Folinic","p":"医疗","s":"医师","r":5,"y":"ya ye"},{"id":"char_4196_reckpr","n":"录武官","e":"Record Keeper","p":"医疗","s":"医师","r":5,"y":"lu wu guan"},{"id":"char_348_ceylon","n":"锡兰","e":"Ceylon","p":"医疗","s":"疗养师","r":5,"y":"xi lan"},{"id":"char_436_whispr","n":"絮雨","e":"Whisperain","p":"医疗","s":"疗养师","r":5,"y":"xu yu"},{"id":"char_4173_nowell","n":"诺威尔","e":"Nowell","p":"医疗","s":"疗养师","r":5,"y":"nuo wei er"},{"id":"char_402_tuye","n":"图耶","e":"Tuye","p":"医疗","s":"医师","r":5,"y":"tu ye"},{"id":"char_473_mberry","n":"桑葚","e":"Mulberry","p":"医疗","s":"行医","r":5,"y":"sang ren"},{"id":"char_449_glider","n":"蜜莓","e":"Honeyberry","p":"医疗","s":"行医","r":5,"y":"mi mei"},{"id":"char_4114_harold","n":"哈洛德","e":"Harold","p":"医疗","s":"行医","r":5,"y":"ha luo de"},{"id":"char_1024_hbisc2","n":"濯尘芙蓉","e":"Hibiscus the Purifier","p":"医疗","s":"咒愈师","r":5,"y":"zhuo chen fu rong"},{"id":"char_494_vendla","n":"刺玫","e":"Vendela","p":"医疗","s":"咒愈师","r":5,"y":"ci mei"},{"id":"char_4071_peper","n":"明椒","e":"Paprika","p":"医疗","s":"链愈师","r":5,"y":"ming jiao"},{"id":"char_4139_papyrs","n":"莎草","e":"Papyrus","p":"医疗","s":"链愈师","r":5,"y":"sha cao"},{"id":"char_4224_turdus","n":"乌啾","e":"Укусик","p":"医疗","s":"链愈师","r":5,"y":"wu jiu"},{"id":"char_4222_taraxa","n":"风絮","e":"Taraxacum","p":"医疗","s":"守望者","r":5,"y":"feng xu"},{"id":"char_148_nearl","n":"临光","e":"Nearl","p":"重装","s":"守护者","r":5,"y":"lin guang"},{"id":"char_226_hmau","n":"吽","e":"Hung","p":"重装","s":"守护者","r":5,"y":"hong"},{"id":"char_4109_baslin","n":"深律","e":"Bassline","p":"重装","s":"守护者","r":5,"y":"shen lv"},{"id":"char_4143_sensi","n":"森西","e":"Senshi","p":"重装","s":"守护者","r":5,"y":"sen xi"},{"id":"char_144_red","n":"红","e":"Projekt Red","p":"特种","s":"处决者","r":5,"y":"hong"},{"id":"char_243_waaifu","n":"槐琥","e":"Waai Fu","p":"特种","s":"处决者","r":5,"y":"huai hu"},{"id":"char_214_kafka","n":"卡夫卡","e":"Kafka","p":"特种","s":"处决者","r":5,"y":"ka fu ka"},{"id":"char_455_nothin","n":"乌有","e":"Mr.Nothing","p":"特种","s":"行商","r":5,"y":"wu you"},{"id":"char_4155_talr","n":"裁度","e":"Figurino","p":"特种","s":"行商","r":5,"y":"cai du"},{"id":"char_107_liskam","n":"雷蛇","e":"Liskarm","p":"重装","s":"哨戒铁卫","r":5,"y":"lei she"},{"id":"char_4137_udflow","n":"深巡","e":"Underflow","p":"重装","s":"哨戒铁卫","r":5,"y":"shen xun"},{"id":"char_201_moeshd","n":"可颂","e":"Croissant","p":"重装","s":"铁卫","r":5,"y":"ke song"},{"id":"char_325_bison","n":"拜松","e":"Bison","p":"重装","s":"铁卫","r":5,"y":"bai song"},{"id":"char_163_hpsts","n":"火神","e":"Vulcan","p":"重装","s":"不屈者","r":5,"y":"huo shen"},{"id":"char_4207_branch","n":"折桠","e":"Веточки","p":"重装","s":"不屈者","r":5,"y":"zhe ya"},{"id":"char_378_asbest","n":"石棉","e":"Asbestos","p":"重装","s":"驭法铁卫","r":5,"y":"shi mian"},{"id":"char_4025_aprot2","n":"暮落","e":"Shalem","p":"重装","s":"驭法铁卫","r":5,"y":"mu luo"},{"id":"char_4047_pianst","n":"车尔尼","e":"Czerny","p":"重装","s":"驭法铁卫","r":5,"y":"che er ni"},{"id":"char_457_blitz","n":"闪击","e":"Blitz","p":"重装","s":"哨戒铁卫","r":5,"y":"shan ji"},{"id":"char_304_zebra","n":"暴雨","e":"Heavyrain","p":"重装","s":"铁卫","r":5,"y":"bao yu"},{"id":"char_431_ashlok","n":"灰毫","e":"Ashlock","p":"重装","s":"要塞","r":5,"y":"hui hao"},{"id":"char_493_firwhl","n":"火哨","e":"Firewhistle","p":"重装","s":"要塞","r":5,"y":"huo shao"},{"id":"char_422_aurora","n":"极光","e":"Aurora","p":"重装","s":"决战者","r":5,"y":"ji guang"},{"id":"char_464_cement","n":"洋灰","e":"Cement","p":"重装","s":"决战者","r":5,"y":"yang hui"},{"id":"char_4148_philae","n":"菲莱","e":"Philae","p":"重装","s":"本源铁卫","r":5,"y":"fei lai"},{"id":"char_4225_tanya","n":"裂响","e":"Crackborne","p":"重装","s":"本源铁卫","r":5,"y":"lie xiang"},{"id":"char_145_prove","n":"普罗旺斯","e":"Provence","p":"狙击","s":"重射手","r":5,"y":"pu luo wang si"},{"id":"char_4006_melnte","n":"玫拉","e":"Melanite","p":"狙击","s":"重射手","r":5,"y":"mei la"},{"id":"char_158_milu","n":"守林人","e":"Firewatch","p":"狙击","s":"神射手","r":5,"y":"shou lin ren"},{"id":"char_218_cuttle","n":"安哲拉","e":"Andreana","p":"狙击","s":"神射手","r":5,"y":"an zhe la"},{"id":"char_4014_lunacu","n":"子月","e":"Lunacub","p":"狙击","s":"神射手","r":5,"y":"zi yue"},{"id":"char_363_toddi","n":"熔泉","e":"Toddifons","p":"狙击","s":"攻城手","r":5,"y":"rong quan"},{"id":"char_4043_erato","n":"埃拉托","e":"Erato","p":"狙击","s":"攻城手","r":5,"y":"ai la tuo"},{"id":"char_4221_ju","n":"矩","e":"Ju","p":"狙击","s":"攻城手","r":5,"y":"ju"},{"id":"char_1027_greyy2","n":"承曦格雷伊","e":"Greyy the Lightningbearer","p":"狙击","s":"投掷手","r":5,"y":"cheng xi ge lei yi"},{"id":"char_4104_coldst","n":"冰酿","e":"Coldshot","p":"狙击","s":"猎手","r":5,"y":"bing niang"},{"id":"char_4211_snhunt","n":"雪猎","e":"Snow Hunter","p":"狙击","s":"猎手","r":5,"y":"xue lie"},{"id":"char_4177_brigid","n":"水灯心","e":"Brigid","p":"狙击","s":"回环射手","r":5,"y":"shui deng xin"},{"id":"char_4015_spuria","n":"空构","e":"Spuria","p":"特种","s":"怪杰","r":5,"y":"kong gou"},{"id":"char_173_slchan","n":"崖心","e":"Cliffheart","p":"特种","s":"钩索师","r":5,"y":"ya xin"},{"id":"char_383_snsant","n":"雪雉","e":"Snowsant","p":"特种","s":"钩索师","r":5,"y":"xue zhi"},{"id":"char_4105_almond","n":"杏仁","e":"Almond","p":"特种","s":"钩索师","r":5,"y":"xing ren"},{"id":"char_174_slbell","n":"初雪","e":"Pramanix","p":"辅助","s":"削弱者","r":5,"y":"chu xue"},{"id":"char_254_vodfox","n":"巫恋","e":"Shamare","p":"辅助","s":"削弱者","r":5,"y":"wu lian"},{"id":"char_4079_haini","n":"海霓","e":"Lucilla","p":"辅助","s":"削弱者","r":5,"y":"hai ni"},{"id":"char_393_toledo","n":"德·托莱多","e":"de Toledo","p":"辅助","s":"削弱者","r":5,"y":"de tuo lai duo"},{"id":"char_195_glassb","n":"真理","e":"Истина","p":"辅助","s":"凝滞师","r":5,"y":"zhen li"},{"id":"char_326_glacus","n":"格劳克斯","e":"Glaucus","p":"辅助","s":"凝滞师","r":5,"y":"ge lao ke si"},{"id":"char_4032_provs","n":"但书","e":"Proviso","p":"辅助","s":"凝滞师","r":5,"y":"dan shu"},{"id":"char_4122_grabds","n":"小满","e":"Grain Buds","p":"辅助","s":"凝滞师","r":5,"y":"xiao man"},{"id":"char_433_windft","n":"掠风","e":"Windflit","p":"辅助","s":"工匠","r":5,"y":"lve feng"},{"id":"char_4162_cathy","n":"凯瑟琳","e":"Catherine","p":"辅助","s":"工匠","r":5,"y":"kai se lin"},{"id":"char_4178_alanna","n":"阿兰娜","e":"Alanna","p":"辅助","s":"工匠","r":5,"y":"a lan na"},{"id":"char_101_sora","n":"空","e":"Sora","p":"辅助","s":"吟游者","r":5,"y":"kong"},{"id":"char_4045_heidi","n":"海蒂","e":"Heidi","p":"辅助","s":"吟游者","r":5,"y":"hai di"},{"id":"char_4184_dolris","n":"三角初华","e":"Misumi Uika","p":"辅助","s":"吟游者","r":5,"y":"san jiao|jue chu hua"},{"id":"char_343_tknogi","n":"月禾","e":"Tsukinogi","p":"辅助","s":"护佑者","r":5,"y":"yue he"},{"id":"char_4019_ncdeer","n":"九色鹿","e":"Nine-Colored Deer","p":"辅助","s":"护佑者","r":5,"y":"jiu se lu"},{"id":"char_492_quercu","n":"夏栎","e":"Quercus","p":"辅助","s":"护佑者","r":5,"y":"xia li"},{"id":"char_4172_xingzh","n":"行箸","e":"Xingzhu","p":"辅助","s":"护佑者","r":5,"y":"xing|hang zhu"},{"id":"char_1022_flwr2","n":"撷英调香师","e":"Perfumer the Distilled","p":"辅助","s":"护佑者","r":5,"y":"xie ying diao|tiao xiang shi"},{"id":"char_4102_threye","n":"凛视","e":"Valarqvin","p":"辅助","s":"巫役","r":5,"y":"lin shi"},{"id":"char_487_bobb","n":"波卜","e":"Bobbing","p":"辅助","s":"巫役","r":5,"y":"bo bo"},{"id":"char_4223_botany","n":"伯塔尼","e":"Ботани","p":"辅助","s":"巫役","r":5,"y":"bo ta ni"},{"id":"char_4219_yukari","n":"岳羽由加莉","e":"Yukari Takeba","p":"辅助","s":"游击手","r":5,"y":"yue yu you jia li"},{"id":"char_4234_pedro","n":"佩德洛","e":"Pedro","p":"辅助","s":"游击手","r":5,"y":"pei de luo"},{"id":"char_215_mantic","n":"狮蝎","e":"Manticore","p":"特种","s":"伏击客","r":5,"y":"shi xie"},{"id":"char_478_kirara","n":"绮良","e":"Kirara","p":"特种","s":"伏击客","r":5,"y":"qi liang"},{"id":"char_4186_tmoris","n":"八幡海铃","e":"Yahata Umiri","p":"特种","s":"伏击客","r":5,"y":"ba fan hai ling"},{"id":"char_241_panda","n":"食铁兽","e":"FEater","p":"特种","s":"推击手","r":5,"y":"shi tie shou"},{"id":"char_4036_forcer","n":"见行者","e":"Enforcer","p":"特种","s":"推击手","r":5,"y":"jian xing|hang zhe"},{"id":"char_451_robin","n":"罗宾","e":"Robin","p":"特种","s":"陷阱师","r":5,"y":"luo bin"},{"id":"char_458_rfrost","n":"霜华","e":"Frost","p":"特种","s":"陷阱师","r":5,"y":"shuang hua"},{"id":"char_4171_wulfen","n":"钼铅","e":"Wulfenite","p":"特种","s":"陷阱师","r":5,"y":"mu qian"},{"id":"char_369_bena","n":"贝娜","e":"Bena","p":"特种","s":"傀儡师","r":5,"y":"bei na"},{"id":"char_4016_kazema","n":"风丸","e":"Kazemaru","p":"特种","s":"傀儡师","r":5,"y":"feng wan"},{"id":"char_4124_iana","n":"双月","e":"Iana","p":"特种","s":"傀儡师","r":5,"y":"shuang yue"},{"id":"char_4183_mortis","n":"若叶睦","e":"Wakaba Mutsumi","p":"特种","s":"傀儡师","r":5,"y":"ruo ye mu"},{"id":"char_4151_tinman","n":"锡人","e":"Tin Man","p":"特种","s":"炼金师","r":5,"y":"xi ren"},{"id":"char_4232_hbound","n":"旅骨","e":"Homebound","p":"特种","s":"炼金师","r":5,"y":"lv gu"},{"id":"char_4191_tippi","n":"蒂比","e":"Tippi","p":"特种","s":"巡空者","r":5,"y":"di bi"},{"id":"char_103_angel","n":"能天使","e":"Exusiai","p":"狙击","s":"速射手","r":6,"y":"neng tian shi"},{"id":"char_332_archet","n":"空弦","e":"Archetto","p":"狙击","s":"速射手","r":6,"y":"kong xian"},{"id":"char_456_ash","n":"灰烬","e":"Ash","p":"狙击","s":"速射手","r":6,"y":"hui jin"},{"id":"char_340_shwaz","n":"黑","e":"Schwarz","p":"狙击","s":"重射手","r":6,"y":"hei"},{"id":"char_4055_bgsnow","n":"鸿雪","e":"Позёмка","p":"狙击","s":"重射手","r":6,"y":"hong xue"},{"id":"char_1048_orchd2","n":"焰狐龙梓兰","e":"Violet Mizutsune Orchid","p":"狙击","s":"重射手","r":6,"y":"yan hu long zi lan"},{"id":"char_430_fartth","n":"远牙","e":"Fartooth","p":"狙击","s":"神射手","r":6,"y":"yuan ya"},{"id":"char_4193_lemuen","n":"蕾缪安","e":"Lemuen","p":"狙击","s":"神射手","r":6,"y":"lei mou an"},{"id":"char_113_cqbw","n":"W","e":"W","p":"狙击","s":"炮手","r":6,"y":"w"},{"id":"char_300_phenxi","n":"菲亚梅塔","e":"Fiammetta","p":"狙击","s":"炮手","r":6,"y":"fei ya mei ta"},{"id":"char_197_poca","n":"早露","e":"Роса","p":"狙击","s":"攻城手","r":6,"y":"zao lu"},{"id":"char_2012_typhon","n":"提丰","e":"Typhon","p":"狙击","s":"攻城手","r":6,"y":"ti feng"},{"id":"char_391_rosmon","n":"迷迭香","e":"Rosmontis","p":"狙击","s":"投掷手","r":6,"y":"mi die xiang"},{"id":"char_1035_wisdel","n":"维什戴尔","e":"Wiš'adel","p":"狙击","s":"投掷手","r":6,"y":"wei shen dai er"},{"id":"char_1013_chen2","n":"假日威龙陈","e":"Ch'en the Holungday","p":"狙击","s":"散射手","r":6,"y":"jia ri wei long chen"},{"id":"char_4117_ray","n":"莱伊","e":"Ray","p":"狙击","s":"猎手","r":6,"y":"lai yi"},{"id":"char_4138_narant","n":"娜仁图亚","e":"Narantuya","p":"狙击","s":"回环射手","r":6,"y":"na ren tu ya"},{"id":"char_112_siege","n":"推进之王","e":"Siege","p":"先锋","s":"尖兵","r":6,"y":"tui jin zhi wang"},{"id":"char_222_bpipe","n":"风笛","e":"Bagpipe","p":"先锋","s":"冲锋手","r":6,"y":"feng di"},{"id":"char_362_saga","n":"嵯峨","e":"Saga","p":"先锋","s":"尖兵","r":6,"y":"cuo e"},{"id":"char_4026_vulpis","n":"忍冬","e":"Vulpisfoglia","p":"先锋","s":"尖兵","r":6,"y":"ren dong"},{"id":"char_479_sleach","n":"琴柳","e":"Saileach","p":"先锋","s":"执旗手","r":6,"y":"qin liu"},{"id":"char_420_flamtl","n":"焰尾","e":"Flametail","p":"先锋","s":"尖兵","r":6,"y":"yan wei"},{"id":"char_427_vigil","n":"伺夜","e":"Vigil","p":"先锋","s":"战术家","r":6,"y":"ci ye"},{"id":"char_249_mlyss","n":"缪尔赛思","e":"Muelsyse","p":"先锋","s":"战术家","r":6,"y":"mou er sai si"},{"id":"char_4228_closur","n":"可露希尔","e":"Closure","p":"先锋","s":"战术家","r":6,"y":"ke lu xi er"},{"id":"char_1045_svash2","n":"凛御银灰","e":"SilverAsh the Reignfrost","p":"先锋","s":"策士","r":6,"y":"lin yu yin hui"},{"id":"char_4087_ines","n":"伊内丝","e":"Ines","p":"先锋","s":"情报官","r":6,"y":"yi nei si"},{"id":"char_134_ifrit","n":"伊芙利特","e":"Ifrit","p":"术师","s":"轰击术师","r":6,"y":"yi fu li te"},{"id":"char_4229_aphris","n":"谬因","e":"Aphrissa","p":"术师","s":"轰击术师","r":6,"y":"miu yin"},{"id":"char_213_mostma","n":"莫斯提马","e":"Mostima","p":"术师","s":"扩散术师","r":6,"y":"mo si ti ma"},{"id":"char_180_amgoat","n":"艾雅法拉","e":"Eyjafjalla","p":"术师","s":"中坚术师","r":6,"y":"ai ya fa la"},{"id":"char_2013_cerber","n":"刻俄柏","e":"Ceobe","p":"术师","s":"中坚术师","r":6,"y":"ke e bai"},{"id":"char_4027_heyak","n":"霍尔海雅","e":"Ho'olheyak","p":"术师","s":"中坚术师","r":6,"y":"huo er hai ya"},{"id":"char_4133_logos","n":"逻各斯","e":"Logos","p":"术师","s":"中坚术师","r":6,"y":"luo ge si"},{"id":"char_2015_dusk","n":"夕","e":"Dusk","p":"术师","s":"扩散术师","r":6,"y":"xi"},{"id":"char_4141_marcil","n":"玛露西尔","e":"Marcille","p":"术师","s":"扩散术师","r":6,"y":"ma lu xi er"},{"id":"char_472_pasngr","n":"异客","e":"Passenger","p":"术师","s":"链术师","r":6,"y":"yi ke"},{"id":"char_426_billro","n":"卡涅利安","e":"Carnelian","p":"术师","s":"阵法术师","r":6,"y":"ka nie li an"},{"id":"char_4080_lin","n":"林","e":"Lin","p":"术师","s":"阵法术师","r":6,"y":"lin"},{"id":"char_1046_sbell2","n":"圣聆初雪","e":"Pramanix the Prerita","p":"术师","s":"阵法术师","r":6,"y":"sheng ling chu xue"},{"id":"char_377_gdglow","n":"澄闪","e":"Goldenglow","p":"术师","s":"驭械术师","r":6,"y":"cheng shan"},{"id":"char_1038_whitw2","n":"荒芜拉普兰德","e":"Lappland the Decadenza","p":"术师","s":"驭械术师","r":6,"y":"huang wu la pu lan de"},{"id":"char_4046_ebnhlz","n":"黑键","e":"Ebenholz","p":"术师","s":"秘术师","r":6,"y":"hei jian"},{"id":"char_4226_veen","n":"维伊","e":"Вий","p":"术师","s":"秘术师","r":6,"y":"wei yi"},{"id":"char_4146_nymph","n":"妮芙","e":"Nymph","p":"术师","s":"本源术师","r":6,"y":"ni fu"},{"id":"char_1040_blaze2","n":"烛煌","e":"Blaze the Igniting Spark","p":"术师","s":"本源术师","r":6,"y":"zhu huang"},{"id":"char_4204_mantra","n":"真言","e":"Mantra","p":"术师","s":"本源术师","r":6,"y":"zhen yan"},{"id":"char_450_necras","n":"死芒","e":"Necrass","p":"术师","s":"塑灵术师","r":6,"y":"si mang"},{"id":"char_206_gnosis","n":"灵知","e":"Gnosis","p":"辅助","s":"削弱者","r":6,"y":"ling zhi"},{"id":"char_291_aglina","n":"安洁莉娜","e":"Angelina","p":"辅助","s":"凝滞师","r":6,"y":"an jie li na"},{"id":"char_358_lisa","n":"铃兰","e":"Suzuran","p":"辅助","s":"凝滞师","r":6,"y":"ling lan"},{"id":"char_1047_halo2","n":"溯光星源","e":"Astgenne the Lightchaser","p":"辅助","s":"凝滞师","r":6,"y":"su guang xing yuan"},{"id":"char_248_mgllan","n":"麦哲伦","e":"Magallan","p":"辅助","s":"召唤师","r":6,"y":"mai zhe lun"},{"id":"char_4195_radian","n":"电弧","e":"Raidian","p":"辅助","s":"召唤师","r":6,"y":"dian hu"},{"id":"char_1012_skadi2","n":"浊心斯卡蒂","e":"Skadi the Corrupting Heart","p":"辅助","s":"吟游者","r":6,"y":"zhuo xin si ka di"},{"id":"char_4134_cetsyr","n":"魔王","e":"Civilight Eterna","p":"辅助","s":"吟游者","r":6,"y":"mo wang"},{"id":"char_1031_slent2","n":"淬羽赫默","e":"Silence the Paradigmatic","p":"辅助","s":"护佑者","r":6,"y":"cui yu he mo"},{"id":"char_4202_haruka","n":"遥","e":"Haruka","p":"辅助","s":"护佑者","r":6,"y":"yao"},{"id":"char_2023_ling","n":"令","e":"Ling","p":"辅助","s":"召唤师","r":6,"y":"ling"},{"id":"char_4072_ironmn","n":"白铁","e":"Stainless","p":"辅助","s":"工匠","r":6,"y":"bai tie"},{"id":"char_4212_nasti","n":"娜斯提","e":"Nasti","p":"辅助","s":"工匠","r":6,"y":"na si ti"},{"id":"char_245_cello","n":"塑心","e":"Virtuosa","p":"辅助","s":"巫役","r":6,"y":"su xin"},{"id":"char_1042_phatm2","n":"酒神","e":"Tragodia","p":"辅助","s":"巫役","r":6,"y":"jiu shen"},{"id":"char_250_phatom","n":"傀影","e":"Phantom","p":"特种","s":"处决者","r":6,"y":"gui ying"},{"id":"char_1028_texas2","n":"缄默德克萨斯","e":"Texas the Omertosa","p":"特种","s":"处决者","r":6,"y":"jian mo de ke sa si"},{"id":"char_1029_yato2","n":"麒麟R夜刀","e":"Kirin R Yato","p":"特种","s":"处决者","r":6,"y":"qi lin r ye dao"},{"id":"char_1502_crosly","n":"弑君者","e":"Crownslayer","p":"特种","s":"处决者","r":6,"y":"shi jun zhe"},{"id":"char_322_lmlee","n":"老鲤","e":"Lee","p":"特种","s":"行商","r":6,"y":"lao li"},{"id":"char_1033_swire2","n":"琳琅诗怀雅","e":"Swire the Elegant Wit","p":"特种","s":"行商","r":6,"y":"lin lang shi huai ya"},{"id":"char_400_weedy","n":"温蒂","e":"Weedy","p":"特种","s":"推击手","r":6,"y":"wen di"},{"id":"char_225_haak","n":"阿","e":"Aak","p":"特种","s":"怪杰","r":6,"y":"a"},{"id":"char_1041_angel2","n":"新约能天使","e":"Exusiai the New Covenant","p":"特种","s":"怪杰","r":6,"y":"xin yue neng tian shi"},{"id":"char_474_glady","n":"歌蕾蒂娅","e":"Gladiia","p":"特种","s":"钩索师","r":6,"y":"ge lei di ya"},{"id":"char_437_mizuki","n":"水月","e":"Mizuki","p":"特种","s":"伏击客","r":6,"y":"shui yue"},{"id":"char_4132_ascln","n":"阿斯卡纶","e":"Ascalon","p":"特种","s":"伏击客","r":6,"y":"a si ka lun"},{"id":"char_1023_ghost2","n":"归溟幽灵鲨","e":"Specter the Unchained","p":"特种","s":"傀儡师","r":6,"y":"gui ming you ling sha"},{"id":"char_4217_makoto","n":"结城理","e":"Makoto Yuki","p":"特种","s":"傀儡师","r":6,"y":"jie cheng li"},{"id":"char_4048_doroth","n":"多萝西","e":"Dorothy","p":"特种","s":"陷阱师","r":6,"y":"duo luo xi"},{"id":"char_4123_ela","n":"艾拉","e":"Ela","p":"特种","s":"陷阱师","r":6,"y":"ai la"},{"id":"char_2027_wang","n":"望","e":"Wang","p":"特种","s":"陷阱师","r":6,"y":"wang"},{"id":"char_1039_thorn2","n":"引星棘刺","e":"Thorns the Lodestar","p":"特种","s":"炼金师","r":6,"y":"yin xing ji ci"},{"id":"char_1015_aglna2","n":"予愿安洁莉娜","e":"Angelina the Mellow Wish","p":"特种","s":"巡空者","r":6,"y":"yu yuan an jie li na"},{"id":"char_147_shining","n":"闪灵","e":"Shining","p":"医疗","s":"医师","r":6,"y":"shan ling"},{"id":"char_179_cgbird","n":"夜莺","e":"Nightingale","p":"医疗","s":"群愈师","r":6,"y":"ye ying"},{"id":"char_003_kalts","n":"凯尔希","e":"Kal'tsit","p":"医疗","s":"医师","r":6,"y":"kai er xi"},{"id":"char_4042_lumen","n":"流明","e":"Lumen","p":"医疗","s":"疗养师","r":6,"y":"liu ming"},{"id":"char_1016_agoat2","n":"纯烬艾雅法拉","e":"Eyjafjalla the Hvít Aska","p":"医疗","s":"行医","r":6,"y":"chun jin ai ya fa la"},{"id":"char_1020_reed2","n":"焰影苇草","e":"Reed The Flame Shadow","p":"医疗","s":"咒愈师","r":6,"y":"yan ying wei cao"},{"id":"char_4056_titi","n":"缇缇","e":"Titi","p":"医疗","s":"咒愈师","r":6,"y":"ti ti"},{"id":"char_4179_monstr","n":"Mon3tr","e":"Mon3tr","p":"医疗","s":"链愈师","r":6,"y":"mon3tr"},{"id":"char_1052_kalts2","n":"凯尔希·思衡托","e":"Kal'tsit·Esperanta","p":"医疗","s":"守望者","r":6,"y":"kai er xi si heng tuo"},{"id":"char_136_hsguma","n":"星熊","e":"Hoshiguma","p":"重装","s":"铁卫","r":6,"y":"xing xiong"},{"id":"char_202_demkni","n":"塞雷娅","e":"Saria","p":"重装","s":"守护者","r":6,"y":"sai lei ya"},{"id":"char_423_blemsh","n":"瑕光","e":"Blemishine","p":"重装","s":"守护者","r":6,"y":"xia guang"},{"id":"char_2025_shu","n":"黍","e":"Shu","p":"重装","s":"守护者","r":6,"y":"shu"},{"id":"char_2014_nian","n":"年","e":"Nian","p":"重装","s":"铁卫","r":6,"y":"nian"},{"id":"char_311_mudrok","n":"泥岩","e":"Mudrock","p":"重装","s":"不屈者","r":6,"y":"ni yan"},{"id":"char_4065_judge","n":"斥罪","e":"Penance","p":"重装","s":"不屈者","r":6,"y":"chi zui"},{"id":"char_416_zumama","n":"森蚺","e":"Eunectes","p":"重装","s":"决战者","r":6,"y":"sen ran"},{"id":"char_4039_horn","n":"号角","e":"Horn","p":"重装","s":"要塞","r":6,"y":"hao jiao|jue"},{"id":"char_1034_jesca2","n":"涤火杰西卡","e":"Jessica the Liberated","p":"重装","s":"哨戒铁卫","r":6,"y":"di huo jie xi ka"},{"id":"char_4194_rmixer","n":"信仰搅拌机","e":"Sankta Miksaparato","p":"重装","s":"哨戒铁卫","r":6,"y":"xin yang jiao ban ji"},{"id":"char_4230_mcnist","n":"机械师","e":"Mechanist","p":"重装","s":"哨戒铁卫","r":6,"y":"ji xie shi"},{"id":"char_2026_yu","n":"余","e":"Yu","p":"重装","s":"本源铁卫","r":6,"y":"yu"},{"id":"char_4235_thumpy","n":"珊比","e":"Thumpy","p":"重装","s":"本源铁卫","r":6,"y":"shan bi"},{"id":"char_1044_hsgma2","n":"斩业星熊","e":"Hoshiguma the Breacher","p":"重装","s":"驭法铁卫","r":6,"y":"zhan ye xing xiong"},{"id":"char_264_f12yin","n":"山","e":"Mountain","p":"近卫","s":"斗士","r":6,"y":"shan"},{"id":"char_2024_chyue","n":"重岳","e":"Chongyue","p":"近卫","s":"斗士","r":6,"y":"zhong|chong yue"},{"id":"char_4037_demetr","n":"贝洛内","e":"Bellone","p":"近卫","s":"斗士","r":6,"y":"bei luo nei"},{"id":"char_172_svrash","n":"银灰","e":"SilverAsh","p":"近卫","s":"领主","r":6,"y":"yin hui"},{"id":"char_293_thorns","n":"棘刺","e":"Thorns","p":"近卫","s":"领主","r":6,"y":"ji ci"},{"id":"char_4082_qiubai","n":"仇白","e":"Qiubai","p":"近卫","s":"领主","r":6,"y":"chou bai"},{"id":"char_4182_oblvns","n":"丰川祥子","e":"Togawa Sakiko","p":"近卫","s":"领主","r":6,"y":"feng chuan xiang zi"},{"id":"char_4088_hodrer","n":"赫德雷","e":"Hoederer","p":"近卫","s":"重剑手","r":6,"y":"he de lei"},{"id":"char_4145_ulpia","n":"乌尔比安","e":"Ulpianus","p":"近卫","s":"重剑手","r":6,"y":"wu er bi an"},{"id":"char_4058_pepe","n":"佩佩","e":"Pepe","p":"近卫","s":"撼地者","r":6,"y":"pei pei"},{"id":"char_1051_headb2","n":"怒潮凛冬","e":"Zima the Raging Tide","p":"近卫","s":"撼地者","r":6,"y":"nu chao lin dong"},{"id":"char_010_chen","n":"陈","e":"Ch'en","p":"近卫","s":"剑豪","r":6,"y":"chen"},{"id":"char_4009_irene","n":"艾丽妮","e":"Irene","p":"近卫","s":"剑豪","r":6,"y":"ai li ni"},{"id":"char_4116_blkkgt","n":"锏","e":"Degenbrecher","p":"近卫","s":"剑豪","r":6,"y":"jian"},{"id":"char_017_huang","n":"煌","e":"Blaze","p":"近卫","s":"强攻手","r":6,"y":"huang"},{"id":"char_1026_gvial2","n":"百炼嘉维尔","e":"Gavial the Invincible","p":"近卫","s":"强攻手","r":6,"y":"bai lian jia wei er"},{"id":"char_350_surtr","n":"史尔特尔","e":"Surtr","p":"近卫","s":"术战者","r":6,"y":"shi er te er"},{"id":"char_4098_vvana","n":"薇薇安娜","e":"Viviana","p":"近卫","s":"术战者","r":6,"y":"wei wei an na"},{"id":"char_1019_siege2","n":"维娜·维多利亚","e":"Vina Victoria","p":"近卫","s":"术战者","r":6,"y":"wei na wei duo li ya"},{"id":"char_1050_chen3","n":"赤刃明霄陈","e":"Ch'en the Dawnstreak","p":"近卫","s":"术战者","r":6,"y":"chi ren ming xiao chen"},{"id":"char_188_helage","n":"赫拉格","e":"Hellagur","p":"近卫","s":"武者","r":6,"y":"he la ge"},{"id":"char_4121_zuole","n":"左乐","e":"Zuo Le","p":"近卫","s":"武者","r":6,"y":"zuo le|yue"},{"id":"char_485_pallas","n":"帕拉斯","e":"Pallas","p":"近卫","s":"教官","r":6,"y":"pa la si"},{"id":"char_1014_nearl2","n":"耀骑士临光","e":"Nearl the Radiant Knight","p":"近卫","s":"无畏者","r":6,"y":"yao qi shi lin guang"},{"id":"char_4011_lessng","n":"止颂","e":"Lessing","p":"近卫","s":"无畏者","r":6,"y":"zhi song"},{"id":"char_1032_excu2","n":"圣约送葬人","e":"Executor the Ex Foedere","p":"近卫","s":"收割者","r":6,"y":"sheng yue song zang ren"},{"id":"char_4010_etlchi","n":"隐德来希","e":"Entelechia","p":"近卫","s":"收割者","r":6,"y":"yin de lai xi"},{"id":"char_4064_mlynar","n":"玛恩纳","e":"Młynar","p":"近卫","s":"解放者","r":6,"y":"ma en na"},{"id":"char_1043_leizi2","n":"司霆惊蛰","e":"Leizi the Thunderbringer","p":"近卫","s":"解放者","r":6,"y":"si ting jing zhe"},{"id":"char_4231_clemnt","n":"克莱门莎","e":"Clementia","p":"近卫","s":"本源近卫","r":6,"y":"ke lai men sha"},{"id":"char_4214_cairn","n":"响石","e":"Cairn","p":"重装","s":"本源铁卫","r":5,"y":"xiang shi"},{"id":"char_230_savage","n":"暴行","e":"Savage","p":"近卫","s":"强攻手","r":5,"y":"bao xing|hang"},{"id":"char_282_catap","n":"空爆","e":"Catapult","p":"狙击","s":"炮手","r":3,"y":"kong bao"},{"id":"char_283_midn","n":"月见夜","e":"Midnight","p":"近卫","s":"领主","r":3,"y":"yue jian ye"},{"id":"char_137_brownb","n":"猎蜂","e":"Beehunter","p":"近卫","s":"斗士","r":4,"y":"lie feng"},{"id":"char_347_jaksel","n":"杰克","e":"Jackie","p":"近卫","s":"斗士","r":4,"y":"jie ke"},{"id":"char_164_nightm","n":"夜魔","e":"Nightmare","p":"术师","s":"中坚术师","r":5,"y":"ye mo"},{"id":"char_220_grani","n":"格拉尼","e":"Grani","p":"先锋","s":"冲锋手","r":5,"y":"ge la ni"},{"id":"char_263_skadi","n":"斯卡蒂","e":"Skadi","p":"近卫","s":"无畏者","r":6,"y":"si ka di"}];
 const PROFS = ["先锋","近卫","重装","狙击","术师","医疗","辅助","特种"];
@@ -990,6 +1076,7 @@ function liveCfgSave(){
   try { localStorage.setItem("ak-live-cfg", JSON.stringify(liveCfg)); } catch (e) {}
   liveCfgUI();
   if (liveWin && !liveWin.closed) { try { liveWin.postMessage({ type: "ak-live-cfg", cfg: { ...liveCfg } }, "*"); } catch (e) {} }
+  try { obsPush(); } catch (e) {}
 }
 if (!IS_LIVE) {
   liveCfgUI();
@@ -1007,7 +1094,121 @@ function liveSend(){
   const p = { type: "ak-live", ids: current.map(o => o.id), cfg: { ...liveCfg }, t: Date.now() };
   try { localStorage.setItem("ak-live-data", JSON.stringify(p)); } catch (e) {}
   if (liveWin && !liveWin.closed) { try { liveWin.postMessage(p, "*"); } catch (e) {} }
+  try { obsPush(); } catch (e) {}
 }
+// 通过 OBS 自带的 WebSocket（obs-websocket v5）调用 obs-browser 的 emit_event，
+// 浏览器源页面在 OBS 内部运行，不受 Chrome 后台 / 遮挡节流影响。
+const OBS_EVENT = "ak-picker-live";
+function sha256(data){
+  const K = [], H = [], ror = (x, n) => (x >>> n) | (x << (32 - n));
+  for (let c = 2, n = 0; n < 64; c++) {
+    let prime = true; for (let d = 2; d * d <= c; d++) if (c % d === 0) { prime = false; break; }
+    if (prime) { if (n < 8) H[n] = (Math.pow(c, 1 / 2) * 4294967296) | 0; K[n++] = (Math.pow(c, 1 / 3) * 4294967296) | 0; }
+  }
+  const len = data.length, size = ((len + 9 + 63) >> 6) << 6, m = new Uint8Array(size);
+  m.set(data); m[len] = 0x80;
+  const dv = new DataView(m.buffer); dv.setUint32(size - 4, (len * 8) >>> 0); dv.setUint32(size - 8, Math.floor(len / 536870912));
+  const w = new Int32Array(64); let h = H.slice();
+  for (let off = 0; off < size; off += 64) {
+    for (let i = 0; i < 16; i++) w[i] = dv.getInt32(off + i * 4);
+    for (let i = 16; i < 64; i++) {
+      const a = w[i - 15], b = w[i - 2];
+      w[i] = (w[i - 16] + (ror(a, 7) ^ ror(a, 18) ^ (a >>> 3)) + w[i - 7] + (ror(b, 17) ^ ror(b, 19) ^ (b >>> 10))) | 0;
+    }
+    let [a, b, c, d, e, f, g, k] = h;
+    for (let i = 0; i < 64; i++) {
+      const t1 = (k + (ror(e, 6) ^ ror(e, 11) ^ ror(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = ((ror(a, 2) ^ ror(a, 13) ^ ror(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      k = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    h = [a, b, c, d, e, f, g, k].map((x, i) => (x + h[i]) | 0);
+  }
+  const out = new Uint8Array(32), odv = new DataView(out.buffer); h.forEach((x, i) => odv.setInt32(i * 4, x));
+  return out;
+}
+async function sha256b64(text){
+  const bytes = new TextEncoder().encode(text);
+  let hash;
+  try { hash = new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)); } catch (e) { hash = sha256(bytes); }
+  return btoa(String.fromCharCode(...hash));
+}
+const obs = { ws: null, state: "off", msg: "未连接", retry: 0, retryT: 0, beatT: 0, reqId: 0, cfg: { url: "ws://127.0.0.1:4455", pass: "", auto: false } };
+try { Object.assign(obs.cfg, JSON.parse(localStorage.getItem("ak-obs-ws") || "{}")); } catch (e) {}
+function obsSaveCfg(){ try { localStorage.setItem("ak-obs-ws", JSON.stringify(obs.cfg)); } catch (e) {} }
+function obsSetState(state, msg){
+  obs.state = state; obs.msg = msg;
+  if (IS_LIVE) return;
+  const box = $("#wsStatus");
+  box.classList.toggle("on", state === "on"); box.classList.toggle("err", state === "err");
+  $("#wsDot").classList.toggle("on", state === "on");
+  $("#wsText").textContent = msg;
+  $("#wsBtn").textContent = state === "off" || state === "err" ? "连接 OBS" : "断开";
+  $("#obsDot").classList.toggle("on", state === "on");
+}
+function obsConnect(){
+  obsClose(false);
+  const url = $("#wsUrl").value.trim() || "ws://127.0.0.1:4455";
+  obs.cfg.url = url; obs.cfg.pass = $("#wsPass").value; obsSaveCfg();
+  let ws;
+  try { ws = new WebSocket(url, "obswebsocket.json"); } catch (e) { obsSetState("err", "地址格式不对，应类似 ws://127.0.0.1:4455"); return; }
+  obs.ws = ws; obsSetState("wait", "正在连接 OBS…");
+  ws.onmessage = async ev => {
+    let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
+    if (m.op === 0) {
+      const d = { rpcVersion: 1, eventSubscriptions: 0 }, au = m.d && m.d.authentication;
+      if (au) {
+        if (!obs.cfg.pass) { obsSetState("err", "OBS 开启了身份验证，请填写密码"); obsClose(false); return; }
+        d.authentication = await sha256b64(await sha256b64(obs.cfg.pass + au.salt) + au.challenge);
+      }
+      if (ws.readyState === 1) ws.send(JSON.stringify({ op: 1, d }));
+    } else if (m.op === 2) {
+      obs.retry = 0; obs.cfg.auto = true; obsSaveCfg();
+      obsSetState("on", "已连接 OBS，浏览器源会同步显示");
+      obsPush(); clearInterval(obs.beatT); obs.beatT = setInterval(obsPush, 5000); // 浏览器源刷新后也能很快拿到当前结果
+    } else if (m.op === 7 && m.d && m.d.requestStatus && !m.d.requestStatus.result) {
+      obsSetState("err", "OBS 未能转发：" + (m.d.requestStatus.comment || "请确认 OBS 为 28 或更新版本"));
+    }
+  };
+  ws.onclose = ev => {
+    if (obs.ws !== ws) return;
+    clearInterval(obs.beatT); obs.ws = null;
+    if (ev.code === 4009) { obs.cfg.auto = false; obsSaveCfg(); obsSetState("err", "密码不对，请到 OBS「显示连接信息」里核对"); return; }
+    if (obs.state === "err") return;
+    if (obs.cfg.auto) {
+      const wait = Math.min(30, 3 * 2 ** obs.retry++);
+      obsSetState("wait", `没有连上 OBS（OBS 未打开或未开启 WebSocket），${wait} 秒后自动重试`);
+      clearTimeout(obs.retryT); obs.retryT = setTimeout(obsConnect, wait * 1000);
+    } else obsSetState("err", "连接失败：请确认 OBS 已打开，并已开启 WebSocket 服务器");
+  };
+}
+function obsClose(manual){
+  clearTimeout(obs.retryT); clearInterval(obs.beatT);
+  const ws = obs.ws; obs.ws = null;
+  if (ws) { try { ws.close(); } catch (e) {} }
+  if (manual) { obs.cfg.auto = false; obsSaveCfg(); obsSetState("off", "未连接"); }
+}
+function obsPush(){
+  const ws = obs.ws; if (!ws || ws.readyState !== 1 || obs.state !== "on") return;
+  const data = { ids: current.map(o => o.id), cfg: { ...liveCfg } };
+  try { ws.send(JSON.stringify({ op: 6, d: { requestType: "CallVendorRequest", requestId: "ak" + (++obs.reqId),
+    requestData: { vendorName: "obs-browser", requestType: "emit_event", requestData: { event_name: OBS_EVENT, event_data: data } } } })); } catch (e) {}
+}
+
+if (!IS_LIVE) {
+  $("#obsBtn").onclick = () => { const box = $("#obsBox"); box.hidden = !box.hidden; $("#obsBtn").setAttribute("aria-expanded", String(!box.hidden)); if (!box.hidden) box.scrollIntoView({ behavior: "smooth", block: "nearest" }); };
+  $("#obsUrl").value = location.href.split("#")[0] + "#obs";
+  $("#obsUrlCopy").onclick = async () => {
+    const input = $("#obsUrl");
+    try { await navigator.clipboard.writeText(input.value); $("#obsUrlCopy").textContent = "已复制"; }
+    catch (e) { input.focus(); input.select(); $("#obsUrlCopy").textContent = "按 Ctrl+C"; }
+    setTimeout(() => { $("#obsUrlCopy").textContent = "复制"; }, 1600);
+  };
+  $("#wsUrl").value = obs.cfg.url; $("#wsPass").value = obs.cfg.pass;
+  $("#wsBtn").onclick = () => { if (obs.state === "off" || obs.state === "err") { obs.cfg.auto = false; obsConnect(); } else obsClose(true); };
+  [$("#wsUrl"), $("#wsPass")].forEach(el => el.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); obs.cfg.auto = false; obsConnect(); } }));
+  if (obs.cfg.auto) obsConnect(); // 上次连上过：打开页面自动重连
+}
+
 $("#liveBtn").onclick = () => {
   liveCfg.dir = "h"; liveCfgSave(); // 每次打开小窗都从横向开始
   liveWin = window.open(location.href.split("#")[0] + "#live", "akLive", "popup=yes,width=1120,height=210");
@@ -1020,7 +1221,8 @@ window.addEventListener("message", e => {
 
 if (IS_LIVE) (function(){
   document.documentElement.classList.add("live");
-  document.title = "小窗展示 · 干员抽选";
+  if (IS_OBS) document.documentElement.classList.add("obs");
+  document.title = IS_OBS ? "干员抽选 · OBS 浏览器源" : "小窗展示 · 干员抽选";
   const root = $("#live"), view = $("#lvView"), track = $("#lvTrack"), empty = $("#lvEmpty");
   root.hidden = false;
   const cfg = { dir: "h", speed: "2", bg: "white", shape: "circle" };
@@ -1033,9 +1235,9 @@ if (IS_LIVE) (function(){
   function applyCfg(next){
     const prevDir = cfg.dir, d = parseFloat(track.style.getPropertyValue("--d"));
     if (next) Object.assign(cfg, next);
-    document.documentElement.style.setProperty("--lv-bg", cfg.bg === "custom" ? (cfg.bgc || "#ff00ff") : (BG[cfg.bg] || BG.white));
+    if (!IS_OBS) document.documentElement.style.setProperty("--lv-bg", cfg.bg === "custom" ? (cfg.bgc || "#ff00ff") : (BG[cfg.bg] || BG.white));
     build();
-    if (next && prevDir !== cfg.dir) fitWindow(d);
+    if (!IS_OBS && next && prevDir !== cfg.dir) fitWindow(d);
   }
   function cardHTML(o){
     return `<div class="lc" title="${o.n}"><img src="${IMG(o.id)}" alt="${o.n}"></div>`;
@@ -1102,12 +1304,15 @@ if (IS_LIVE) (function(){
     const o = OPMAP.get(id); if (!o) return;
     const els = [track.children[i]];
     if (cycle) els.push(track.children[i + ids.length]);
-    preload([id]).then(() => els.forEach(el => {
-      if (!el) return;
-      const img = el.querySelector("img");
-      img.src = IMG(id); img.alt = o.n; el.title = o.n;
-      el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
-    }));
+    preload([id]).then(() => {
+      if (ids[i] !== id) return; // 等图片期间这一位又换过了，以最新的为准
+      els.forEach(el => {
+        if (!el || !el.isConnected) return;
+        const img = el.querySelector("img");
+        img.src = IMG(id); img.alt = o.n; el.title = o.n;
+        el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop");
+      });
+    });
   }
   let fading = false, pendingFade = false;
   function fadeRebuild(){
@@ -1141,13 +1346,23 @@ if (IS_LIVE) (function(){
     if (e.data.type === "ak-live") { if (cfgChanged(e.data.cfg)) applyCfg(e.data.cfg); setIds(e.data.ids); }
     else if (e.data.type === "ak-live-cfg") applyCfg(e.data.cfg);
   });
+  if (IS_OBS) {
+    // OBS 浏览器源：数据由主页面经 obs-websocket 的 emit_event 推送；记住最后一次，浏览器源刷新后立刻恢复
+    window.addEventListener(OBS_EVENT, e => {
+      const d = e.detail; if (!d || !Array.isArray(d.ids)) return;
+      if (cfgChanged(d.cfg)) applyCfg(d.cfg);
+      setIds(d.ids);
+      try { localStorage.setItem("ak-obs-last", JSON.stringify({ ids: d.ids, cfg: d.cfg })); } catch (x) {}
+    });
+  }
   window.addEventListener("storage", e => {
+    if (IS_OBS) return;
     try {
       if (e.key === "ak-live-data" && e.newValue) setIds(JSON.parse(e.newValue).ids);
       if (e.key === "ak-live-cfg" && e.newValue) { const c = JSON.parse(e.newValue); if (cfgChanged(c)) applyCfg(c); }
     } catch (x) {}
   });
-  try { const d = JSON.parse(localStorage.getItem("ak-live-data") || "null"); if (d) ids = d.ids || []; } catch (e) {}
+  try { const d = JSON.parse(localStorage.getItem(IS_OBS ? "ak-obs-last" : "ak-live-data") || "null"); if (d) { if (IS_OBS && d.cfg) Object.assign(cfg, d.cfg); ids = d.ids || []; } } catch (e) {}
   // 切换横向/竖向时，把窗口调成对应的横长或竖长形状，头像大小保持不变
   function fitWindow(keepD){
     const n = Math.min(Math.max(ids.length, 1), 6);
@@ -1161,7 +1376,7 @@ if (IS_LIVE) (function(){
   addEventListener("resize", build);
   applyCfg();
   requestAnimationFrame(tick);
-  if (window.opener) { try { window.opener.postMessage({ type: "ak-live-ready" }, "*"); } catch (e) {} }
+  if (!IS_OBS && window.opener) { try { window.opener.postMessage({ type: "ak-live-ready" }, "*"); } catch (e) {} }
 })();
 </script>
 </body>
