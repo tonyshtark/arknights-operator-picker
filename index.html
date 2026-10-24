@@ -459,7 +459,8 @@ footer a{color:var(--dim)}
         <ul>
           <li><b>密码只保存在本浏览器</b>，不会上传。开播或共享屏幕时注意别把这块区域露出来。</li>
           <li>浏览器如果询问「是否允许访问本地网络 / 设备」，请选<b>允许</b>，否则连不上 OBS。</li>
-          <li>OBS 里的浏览器源刷新后会先显示上一次的结果，最多 5 秒内对上最新结果。</li>
+          <li>OBS 里的浏览器源刷新后会显示上一次收到的结果。</li>
+          <li><b>只开一个抽选页面</b>：同时开着本地文件和在线网址、或多个标签页时，哪个页面最后操作就显示哪个的结果；用不到的页面请关掉，或点「断开」。</li>
           <li>推荐按第 2 步直接填网址。如果改用「本地文件」选了这个 html，页面也会自动识别自己在 OBS 里，切换成浏览器源画面。</li>
           <li>连不上时依次检查：OBS 是否已打开、WebSocket 是否已开启、端口和密码是否正确、防火墙是否拦截了 OBS。</li>
         </ul>
@@ -1164,7 +1165,9 @@ function obsConnect(){
     } else if (m.op === 2) {
       obs.retry = 0; obs.cfg.auto = true; obsSaveCfg();
       obsSetState("on", "已连接 OBS，浏览器源会同步显示");
-      obsPush(); clearInterval(obs.beatT); obs.beatT = setInterval(obsPush, 5000); // 浏览器源刷新后也能很快拿到当前结果
+      // 手动连接时推送当前结果；自动重连时只有本页已有结果才推送，避免空白的新标签页把 OBS 画面清空。
+      // 不再定时重复推送：多个标签页同时开着时，闲置的页面会不断用旧结果覆盖正在用的页面。浏览器源自己会记住上一次的结果。
+      if (obs.manual || current.length) obsPush();
     } else if (m.op === 7 && m.d && m.d.requestStatus && !m.d.requestStatus.result) {
       obsSetState("err", "OBS 未能转发：" + (m.d.requestStatus.comment || "请确认 OBS 为 28 或更新版本"));
     }
@@ -1189,7 +1192,8 @@ function obsClose(manual){
 }
 function obsPush(){
   const ws = obs.ws; if (!ws || ws.readyState !== 1 || obs.state !== "on") return;
-  const data = { ids: current.map(o => o.id), cfg: { ...liveCfg } };
+  // OBS 内部的 obs_data 不支持字符串数组（会被丢成空数组），所以名单用逗号拼成一个字符串传
+  const data = { idstr: current.map(o => o.id).join(","), cfg: { ...liveCfg } };
   try { ws.send(JSON.stringify({ op: 6, d: { requestType: "CallVendorRequest", requestId: "ak" + (++obs.reqId),
     requestData: { vendorName: "obs-browser", requestType: "emit_event", requestData: { event_name: OBS_EVENT, event_data: data } } } })); } catch (e) {}
 }
@@ -1204,8 +1208,8 @@ if (!IS_LIVE) {
     setTimeout(() => { $("#obsUrlCopy").textContent = "复制"; }, 1600);
   };
   $("#wsUrl").value = obs.cfg.url; $("#wsPass").value = obs.cfg.pass;
-  $("#wsBtn").onclick = () => { if (obs.state === "off" || obs.state === "err") { obs.cfg.auto = false; obsConnect(); } else obsClose(true); };
-  [$("#wsUrl"), $("#wsPass")].forEach(el => el.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); obs.cfg.auto = false; obsConnect(); } }));
+  $("#wsBtn").onclick = () => { if (obs.state === "off" || obs.state === "err") { obs.cfg.auto = false; obs.manual = true; obsConnect(); } else obsClose(true); };
+  [$("#wsUrl"), $("#wsPass")].forEach(el => el.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); obs.cfg.auto = false; obs.manual = true; obsConnect(); } }));
   if (obs.cfg.auto) obsConnect(); // 上次连上过：打开页面自动重连
 }
 
@@ -1349,7 +1353,9 @@ if (IS_LIVE) (function(){
   if (IS_OBS) {
     // OBS 浏览器源：数据由主页面经 obs-websocket 的 emit_event 推送；记住最后一次，浏览器源刷新后立刻恢复
     window.addEventListener(OBS_EVENT, e => {
-      const d = e.detail; if (!d || !Array.isArray(d.ids)) return;
+      const d = e.detail;
+      if (d && typeof d.idstr === "string") d.ids = d.idstr ? d.idstr.split(",") : [];
+      if (!d || !Array.isArray(d.ids)) return;
       if (cfgChanged(d.cfg)) applyCfg(d.cfg);
       setIds(d.ids);
       try { localStorage.setItem("ak-obs-last", JSON.stringify({ ids: d.ids, cfg: d.cfg })); } catch (x) {}
